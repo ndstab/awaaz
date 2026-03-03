@@ -1,0 +1,39 @@
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+*.pot
+*.pyc
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# Django stuff
+staticfiles/
+media/
+
+# IDE/editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Byte-compiled / optimized / DLL files
+*.pyo
+*.pyd
+
+# Coverage / test
+.pytest_cache/
+.coverage*
+htmlcov/
+
+# OS
+.DS_Store
+
+# Docker
+*.pid
+
+# Environment variables
+.env

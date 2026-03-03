@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: awaaz-db
+    environment:
+      POSTGRES_DB: awaaz
+      POSTGRES_USER: awaaz
+      POSTGRES_PASSWORD: awaaz
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: awaaz-redis
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    container_name: awaaz-web
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      DJANGO_SETTINGS_MODULE: awaaz.settings
+
+  worker:
+    build: .
+    container_name: awaaz-worker
+    command: celery -A awaaz worker -l info
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      - redis
+    environment:
+      DJANGO_SETTINGS_MODULE: awaaz.settings
+
+  beat:
+    build: .
+    container_name: awaaz-beat
+    command: celery -A awaaz beat -l info
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      - redis
+    environment:
+      DJANGO_SETTINGS_MODULE: awaaz.settings
+
+volumes:
+  db_data:
+
