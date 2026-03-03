@@ -30,8 +30,9 @@ INSTALLED_APPS = [
   "rest_framework",
   "rest_framework_simplejwt",
   "corsheaders",
-  "incidents",
-  "users",
+  "frontend",
+  "incidents.apps.IncidentsConfig",
+  "users.apps.UsersConfig",
 ]
 
 MIDDLEWARE = [
@@ -123,4 +124,11 @@ CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://redis:6379
 
 INCIDENT_DEDUP_RADIUS_METERS = 300
 INCIDENT_DEDUP_WINDOW_HOURS = 2
+
+CELERY_BEAT_SCHEDULE = {
+  "expire-incidents-every-15-minutes": {
+    "task": "incidents.tasks.expire_incidents",
+    "schedule": timedelta(minutes=15),
+  },
+}
 

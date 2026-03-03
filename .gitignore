@@ -37,3 +37,9 @@ htmlcov/
 
 # Environment variables
 .env
+
+#celery beat schedules
+celerybeat-schedule
+celerybeat-schedule.db
+celerybeat-schedule.dat
+celerybeat-schedule.dir

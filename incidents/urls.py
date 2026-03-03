@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.urls import path
 
+from .feed import AllFeedView, CityFeedView, StateFeedView
 from .views import (
   IncidentConfirmView,
   IncidentDetailView,
@@ -22,5 +23,8 @@ urlpatterns = [
     IncidentResolveView.as_view(),
     name="incident-resolve",
   ),
+  path("feed/all/", AllFeedView.as_view(), name="feed-all"),
+  path("feed/city/<slug:slug>/", CityFeedView.as_view(), name="feed-city"),
+  path("feed/state/<slug:slug>/", StateFeedView.as_view(), name="feed-state"),
 ]
 
