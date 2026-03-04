@@ -43,3 +43,7 @@ celerybeat-schedule
 celerybeat-schedule.db
 celerybeat-schedule.dat
 celerybeat-schedule.dir
+
+
+#code instructions
+instruct.md
