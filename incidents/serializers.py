@@ -70,7 +70,7 @@ class IncidentSerializer(serializers.ModelSerializer):
 
     incident = Incident.objects.create(
       reporter=user,
-      location=Point(lng, lat),
+      location=Point(lng, lat, srid=4326),
       confidence=base_confidence,
       status=(
         Incident.Status.ACTIVE
@@ -100,7 +100,7 @@ class ConfirmationSerializer(serializers.ModelSerializer):
     confirmation = Confirmation.objects.create(
       incident=incident,
       confirmer=user,
-      location=Point(lng, lat),
+      location=Point(lng, lat, srid=4326),
     )
     return confirmation
 

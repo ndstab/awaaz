@@ -34,7 +34,7 @@ class IncidentListCreateView(generics.ListCreateAPIView):
     user = self.request.user
     lat = float(self.request.data.get("lat"))
     lng = float(self.request.data.get("lng"))
-    point = Point(lng, lat)
+    point = Point(lng, lat, srid=4326)
     now = timezone.now()
 
     recent_window = now - timezone.timedelta(hours=INCIDENT_DEDUP_WINDOW_HOURS)
