@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Point, Polygon
 from django.db.models import Q
 from django.utils import timezone
 from rest_framework import generics, permissions, status
@@ -24,10 +24,31 @@ class IncidentListCreateView(generics.ListCreateAPIView):
     )
     city = self.request.query_params.get("city")
     state = self.request.query_params.get("state")
+    types = self.request.query_params.get("type")
+    severities = self.request.query_params.get("severity")
+    bbox = self.request.query_params.get("bbox")
+
     if city:
       qs = qs.filter(city__iexact=city)
     if state:
       qs = qs.filter(state__iexact=state)
+    if types:
+      type_values = [t.strip() for t in types.split(",") if t.strip()]
+      if type_values:
+        qs = qs.filter(type__in=type_values)
+    if severities:
+      severity_values = [s.strip() for s in severities.split(",") if s.strip()]
+      if severity_values:
+        qs = qs.filter(severity__in=severity_values)
+    if bbox:
+      parts = [p.strip() for p in bbox.split(",")]
+      if len(parts) == 4:
+        try:
+          south, west, north, east = map(float, parts)
+          envelope = Polygon.from_bbox((west, south, east, north))
+          qs = qs.filter(location__within=envelope)
+        except ValueError:
+          pass
     return qs
 
   def perform_create(self, serializer):
