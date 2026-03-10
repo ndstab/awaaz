@@ -46,7 +46,8 @@ class IncidentListCreateView(generics.ListCreateAPIView):
         try:
           south, west, north, east = map(float, parts)
           envelope = Polygon.from_bbox((west, south, east, north))
-          qs = qs.filter(location__within=envelope)
+          envelope.srid = 4326
+          qs = qs.filter(location__intersects=envelope)
         except ValueError:
           pass
     return qs
