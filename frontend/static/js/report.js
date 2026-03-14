@@ -43,7 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
     if (!messageEl) return;
 
-    const token = document.getElementById("token").value.trim();
+    const token = typeof requireAuth === "function" ? requireAuth() : null;
+    if (!token) return;
+
     const type = document.getElementById("type").value;
     const severity = document.getElementById("severity").value;
     const description = document.getElementById("description").value;
@@ -58,20 +60,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (!token) {
-      messageEl.textContent = "Paste a JWT access token to submit.";
-      return;
-    }
-
     messageEl.textContent = "Submitting incident…";
 
     try {
       const response = await fetch("/api/v1/incidents/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: typeof authHeaders === "function" ? authHeaders() : { "Content-Type": "application/json", "Authorization": "Bearer " + token },
         body: JSON.stringify({
           type,
           severity,
@@ -85,8 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (!response.ok) {
+        if (typeof handleAuthError === "function" && handleAuthError(response.status)) return;
         const errorText = await response.text();
-        messageEl.textContent = `Error submitting incident (${response.status}): ${errorText}`;
+        messageEl.textContent = `Error (${response.status}): ${errorText}`;
         return;
       }
 

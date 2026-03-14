@@ -1,7 +1,78 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-  <h2>Incident detail</h2>
-  <p>Details coming soon.</p>
+  <h2>{{ incident.type }} • {{ incident.severity }}</h2>
+
+  <dl>
+    <dt>Status</dt>
+    <dd>{{ incident.status }}</dd>
+    <dt>Confidence</dt>
+    <dd>{{ incident.confidence }}%</dd>
+    <dt>Confirmations</dt>
+    <dd>{{ incident.confirmation_count }}</dd>
+    <dt>Location</dt>
+    <dd>{{ incident.city }}{% if incident.state %}, {{ incident.state }}{% endif %}</dd>
+    {% if incident.address_text %}
+    <dt>Address</dt>
+    <dd>{{ incident.address_text }}</dd>
+    {% endif %}
+    {% if incident.description %}
+    <dt>Description</dt>
+    <dd>{{ incident.description }}</dd>
+    {% endif %}
+    <dt>Reported</dt>
+    <dd>{{ incident.reported_at|date:"M d, Y H:i" }}</dd>
+    {% if incident.expires_at %}
+    <dt>Expires</dt>
+    <dd>{{ incident.expires_at|date:"M d, Y H:i" }}</dd>
+    {% endif %}
+  </dl>
+
+  <p><a href="/">← Back to map</a> | <a href="/report/">Report another</a></p>
+
+  <hr />
+
+  <h3>Confirm this incident</h3>
+  <p>Were you at the location? Add your confirmation. You must be logged in.</p>
+  <form id="confirm-form">
+    <input id="lat" type="hidden" value="{{ incident.location.y }}" />
+    <input id="lng" type="hidden" value="{{ incident.location.x }}" />
+    <button type="submit">Confirm</button>
+    <p id="confirm-message" role="status"></p>
+  </form>
+
+  <script src="{% static 'js/auth.js' %}"></script>
+  <script>
+    document.getElementById("confirm-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("confirm-message");
+      const token = typeof requireAuth === "function" ? requireAuth() : null;
+      if (!token) return;
+      const lat = document.getElementById("lat").value;
+      const lng = document.getElementById("lng").value;
+      if (!lat || !lng) {
+        msg.textContent = "Location required.";
+        return;
+      }
+      msg.textContent = "Submitting…";
+      try {
+        const res = await fetch("/api/v1/incidents/{{ incident.id }}/confirm/", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({ lat: parseFloat(lat), lng: parseFloat(lng) })
+        });
+        if (res.ok) {
+          msg.textContent = "Confirmed. Refreshing…";
+          window.location.reload();
+        } else {
+          if (typeof handleAuthError === "function" && handleAuthError(res.status)) return;
+          msg.textContent = "Error " + res.status;
+        }
+      } catch (err) {
+        msg.textContent = "Request failed.";
+      }
+    });
+  </script>
 {% endblock %}
 

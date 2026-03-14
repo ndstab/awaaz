@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <h2>Register</h2>
+
+  <form id="register-form">
+    <div>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required autocomplete="email" />
+    </div>
+    <div>
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text" required autocomplete="username" />
+    </div>
+    <div>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" required autocomplete="new-password" />
+    </div>
+    <div>
+      <label for="role">Role</label>
+      <select id="role" name="role">
+        <option value="CIVILIAN">Civilian</option>
+        <option value="AUTHORITY">Authority</option>
+      </select>
+    </div>
+    <button type="submit">Register</button>
+    <p id="register-message" role="status"></p>
+  </form>
+
+  <p>Already have an account? <a href="/login/">Log in</a></p>
+
+  <script src="{% static 'js/auth.js' %}"></script>
+  <script>
+    document.getElementById("register-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("register-message");
+      const email = document.getElementById("email").value.trim();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const role = document.getElementById("role").value;
+
+      msg.textContent = "Registering…";
+
+      try {
+        const res = await fetch("/api/v1/auth/register/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, username, password, role }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          const err = data.email?.[0] || data.username?.[0] || data.password?.[0] || data.detail || "Registration failed.";
+          msg.textContent = typeof err === "object" ? JSON.stringify(err) : err;
+          return;
+        }
+
+        const loginRes = await fetch("/api/v1/auth/login/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const loginData = await loginRes.json();
+
+        if (loginRes.ok && loginData.access) {
+          setTokens(loginData.access, loginData.refresh);
+          window.location.href = "/";
+        } else {
+          msg.textContent = "Account created. Please log in.";
+          window.location.href = "/login/";
+        }
+      } catch (err) {
+        msg.textContent = "Request failed.";
+      }
+    });
+  </script>
+{% endblock %}

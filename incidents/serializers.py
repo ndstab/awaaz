@@ -90,7 +90,7 @@ class ConfirmationSerializer(serializers.ModelSerializer):
   class Meta:
     model = Confirmation
     fields = ["id", "incident", "confirmer", "location", "confirmed_at", "lat", "lng"]
-    read_only_fields = ["id", "confirmer", "location", "confirmed_at"]
+    read_only_fields = ["id", "incident", "confirmer", "location", "confirmed_at"]
 
   def create(self, validated_data):
     lat = validated_data.pop("lat")

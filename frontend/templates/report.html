@@ -51,17 +51,6 @@
       <input id="address_text" name="address_text" type="text" />
     </div>
 
-    <div>
-      <label for="token">JWT access token (temporary)</label>
-      <input
-        id="token"
-        name="token"
-        type="text"
-        placeholder="Paste access token here"
-        required
-      />
-    </div>
-
     <input id="lat" name="lat" type="hidden" />
     <input id="lng" name="lng" type="hidden" />
 
@@ -74,6 +63,7 @@
   </form>
 
   <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
+  <script src="{% static 'js/auth.js' %}"></script>
   <script src="{% static 'js/report.js' %}"></script>
 {% endblock %}
 
