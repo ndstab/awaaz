@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.measure import D
 from django.contrib.gis.geos import Point, Polygon
 from django.db.models import Q
 from django.utils import timezone
@@ -117,6 +118,12 @@ class IncidentConfirmView(APIView):
     except Incident.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
+    if incident.reporter_id == request.user.id:
+      return Response(
+        {"detail": "You cannot confirm an incident you reported."},
+        status=status.HTTP_400_BAD_REQUEST,
+      )
+
     try:
       lat = float(request.data.get("lat"))
       lng = float(request.data.get("lng"))
@@ -127,7 +134,14 @@ class IncidentConfirmView(APIView):
       )
 
     point = Point(lng, lat, srid=4326)
-    distance_m = incident.location.distance(point)
+    # Use database distance so we get a proper Distance object with meters
+    annotated = (
+      Incident.objects.annotate(dist=Distance("location", point))
+      .only("id")
+      .get(pk=incident.pk)
+    )
+    distance = annotated.dist
+    distance_m = getattr(distance, "m", None)
     if distance_m is None or distance_m > 5000:
       return Response(
         {"detail": "You are too far from this incident to confirm it."},
