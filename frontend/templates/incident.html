@@ -34,10 +34,8 @@
   <hr />
 
   <h3>Confirm this incident</h3>
-  <p>Were you at the location? Add your confirmation. You must be logged in.</p>
+  <p>Were you at the location? Add your confirmation. You must be logged in and share your location once.</p>
   <form id="confirm-form">
-    <input id="lat" type="hidden" value="{{ incident.location.y }}" />
-    <input id="lng" type="hidden" value="{{ incident.location.x }}" />
     <button type="submit">Confirm</button>
     <p id="confirm-message" role="status"></p>
   </form>
@@ -49,29 +47,52 @@
       const msg = document.getElementById("confirm-message");
       const token = typeof requireAuth === "function" ? requireAuth() : null;
       if (!token) return;
-      const lat = document.getElementById("lat").value;
-      const lng = document.getElementById("lng").value;
-      if (!lat || !lng) {
-        msg.textContent = "Location required.";
+
+      if (!navigator.geolocation) {
+        msg.textContent = "Location is not available in this browser.";
         return;
       }
-      msg.textContent = "Submitting…";
-      try {
-        const res = await fetch("/api/v1/incidents/{{ incident.id }}/confirm/", {
-          method: "POST",
-          headers: authHeaders(),
-          body: JSON.stringify({ lat: parseFloat(lat), lng: parseFloat(lng) })
-        });
-        if (res.ok) {
-          msg.textContent = "Confirmed. Refreshing…";
-          window.location.reload();
-        } else {
-          if (typeof handleAuthError === "function" && handleAuthError(res.status)) return;
-          msg.textContent = "Error " + res.status;
+
+      msg.textContent = "Getting your location…";
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          msg.textContent = "Submitting…";
+
+          try {
+            const res = await fetch("/api/v1/incidents/{{ incident.id }}/confirm/", {
+              method: "POST",
+              headers: authHeaders(),
+              body: JSON.stringify({ lat, lng })
+            });
+            if (res.ok) {
+              msg.textContent = "Confirmed. Refreshing…";
+              window.location.reload();
+            } else {
+              if (typeof handleAuthError === "function" && handleAuthError(res.status)) return;
+              msg.textContent = "Error " + res.status;
+            }
+          } catch (err) {
+            msg.textContent = "Request failed.";
+          }
+        },
+        (error) => {
+          if (error.code === error.PERMISSION_DENIED) {
+            msg.textContent = "Location permission denied. Cannot confirm incident.";
+          } else if (error.code === error.TIMEOUT) {
+            msg.textContent = "Timed out getting location.";
+          } else {
+            msg.textContent = "Could not get your location.";
+          }
+        },
+        {
+          enableHighAccuracy: false,
+          maximumAge: 60000,
+          timeout: 10000
         }
-      } catch (err) {
-        msg.textContent = "Request failed.";
-      }
+      );
     });
   </script>
 {% endblock %}

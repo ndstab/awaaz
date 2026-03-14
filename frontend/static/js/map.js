@@ -2,6 +2,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const mapContainer = document.getElementById("map");
   if (!mapContainer) return;
 
+  // Simple log to verify script is running
+  // eslint-disable-next-line no-console
+  console.log("Awaaz map: initializing");
+
   // eslint-disable-next-line no-undef
   const map = new maplibregl.Map({
     container: "map",
@@ -69,20 +73,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const incidents = await response.json();
     if (requestId !== lastRequestId) return;
 
+    // eslint-disable-next-line no-console
+    console.log("Awaaz map: incidents fetched", incidents.length);
+
     const seen = new Set();
     for (const incident of incidents) {
       seen.add(incident.id);
 
-      const coords = coordsFromLocation(incident.location);
-      if (!coords) continue;
-      const [lng, lat] = coords;
+      let lng = incident.longitude;
+      let lat = incident.latitude;
+      if (typeof lng !== "number" || typeof lat !== "number") {
+        const coords = coordsFromLocation(incident.location);
+        if (!coords) continue;
+        [lng, lat] = coords;
+      }
 
       let marker = markersById.get(incident.id);
       if (!marker) {
         const popup = new maplibregl.Popup({ offset: 18 }).setHTML(
           incidentPopupHtml(incident),
         );
-        marker = new maplibregl.Marker().setLngLat([lng, lat]).setPopup(popup).addTo(map);
+        const el = document.createElement("div");
+        el.className = "awaaz-marker";
+        marker = new maplibregl.Marker({ element: el })
+          .setLngLat([lng, lat])
+          .setPopup(popup)
+          .addTo(map);
         markersById.set(incident.id, marker);
       } else {
         marker.setLngLat([lng, lat]);

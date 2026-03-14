@@ -117,6 +117,23 @@ class IncidentConfirmView(APIView):
     except Incident.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
+    try:
+      lat = float(request.data.get("lat"))
+      lng = float(request.data.get("lng"))
+    except (TypeError, ValueError):
+      return Response(
+        {"detail": "lat and lng are required."},
+        status=status.HTTP_400_BAD_REQUEST,
+      )
+
+    point = Point(lng, lat, srid=4326)
+    distance_m = incident.location.distance(point)
+    if distance_m is None or distance_m > 5000:
+      return Response(
+        {"detail": "You are too far from this incident to confirm it."},
+        status=status.HTTP_400_BAD_REQUEST,
+      )
+
     already = Confirmation.objects.filter(
       incident=incident,
       confirmer=request.user,

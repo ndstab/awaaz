@@ -39,3 +39,12 @@ main {
   padding: 1rem;
 }
 
+.awaaz-marker {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #ef4444;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+}
+

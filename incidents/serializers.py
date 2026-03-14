@@ -22,6 +22,8 @@ INCIDENT_TTLS = {
 class IncidentSerializer(serializers.ModelSerializer):
   lat = serializers.FloatField(write_only=True)
   lng = serializers.FloatField(write_only=True)
+  latitude = serializers.FloatField(source="location.y", read_only=True)
+  longitude = serializers.FloatField(source="location.x", read_only=True)
 
   class Meta:
     model = Incident
@@ -44,6 +46,8 @@ class IncidentSerializer(serializers.ModelSerializer):
       "resolved_at",
       "lat",
       "lng",
+      "latitude",
+      "longitude",
     ]
     read_only_fields = [
       "reporter",
