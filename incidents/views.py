@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 
 from awaaz.settings import INCIDENT_DEDUP_RADIUS_METERS, INCIDENT_DEDUP_WINDOW_HOURS
 
-from .models import Incident
+from .models import Confirmation, Incident
 from .serializers import ConfirmationSerializer, IncidentSerializer
 
 
@@ -116,6 +116,16 @@ class IncidentConfirmView(APIView):
       incident = Incident.objects.get(pk=pk)
     except Incident.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
+
+    already = Confirmation.objects.filter(
+      incident=incident,
+      confirmer=request.user,
+    ).exists()
+    if already:
+      return Response(
+        {"detail": "You already confirmed this incident."},
+        status=status.HTTP_400_BAD_REQUEST,
+      )
 
     serializer = ConfirmationSerializer(
       data=request.data,

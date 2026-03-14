@@ -62,8 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchAndRenderIncidents() {
     const requestId = ++lastRequestId;
-    const bbox = bboxParamFromBounds(map.getBounds());
-    const url = `/api/v1/incidents/?bbox=${encodeURIComponent(bbox)}`;
+    const url = "/api/v1/incidents/";
 
     const response = await fetch(url);
     if (!response.ok) return;
