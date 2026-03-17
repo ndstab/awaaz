@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	package="net.osmand.library.sample"
+	android:versionCode="12"
+	android:versionName="1.2">
+
+	<application
+		android:name=".SampleApplication"
+		android:allowBackup="true"
+		android:configChanges="locale"
+		android:icon="@mipmap/sample_app"
+		android:label="@string/app_name"
+		android:largeHeap="true"
+		android:requestLegacyExternalStorage="true"
+		android:restoreAnyVersion="true"
+		android:supportsRtl="true"
+		android:theme="@style/Theme.OsmAndLibrarysample">
+
+		<provider
+			android:name="androidx.core.content.FileProvider"
+			android:authorities="net.osmand.library.sample.fileprovider"
+			android:exported="false"
+			android:grantUriPermissions="true">
+			<meta-data
+				android:name="android.support.FILE_PROVIDER_PATHS"
+				android:resource="@xml/paths" />
+		</provider>
+
+		<activity
+			android:name=".MainActivity"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+
+				<category android:name="android.intent.category.LAUNCHER" />
+				<category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+			</intent-filter>
+		</activity>
+
+		<activity android:name=".SimpleMapActivity" />
+		<activity android:name=".NavigateMapActivity" />
+		<activity android:name=".PointsOnMapActivity" />
+		<activity android:name=".FullMapActivity" />
+
+		<!--used for restart after switch between opengl and legacy renderer-->
+		<activity
+			android:name="net.osmand.plus.activities.RestartActivity"
+			android:exported="false"
+			android:process=":restart"
+			android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+		<!--used for maps downloading-->
+		<activity android:name="net.osmand.plus.download.DownloadActivity" />
+
+	</application>
+
+</manifest>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/root"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	tools:context=".MainActivity"
+	tools:ignore="HardcodedText">
+
+	<com.google.android.material.appbar.AppBarLayout
+		android:id="@+id/appbar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:elevation="5dp">
+
+		<androidx.appcompat.widget.Toolbar
+			android:id="@+id/toolbar"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="?attr/colorPrimary"
+			android:minHeight="56dp"
+			app:titleTextColor="@color/active_buttons_and_links_text_light"
+			tools:title="@string/app_name" />
+
+	</com.google.android.material.appbar.AppBarLayout>
+
+
+	<Button
+		android:id="@+id/download_maps_button"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginHorizontal="@dimen/content_padding"
+		android:layout_marginVertical="@dimen/content_padding_half"
+		android:minHeight="@dimen/route_info_control_buttons_height"
+		android:text="@string/downloads" />
+
+	<Button
+		android:id="@+id/simple_map_button"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginHorizontal="@dimen/content_padding"
+		android:layout_marginVertical="@dimen/content_padding_half"
+		android:minHeight="@dimen/route_info_control_buttons_height"
+		android:text="Simple Map" />
+
+	<Button
+		android:id="@+id/navigate_map_button"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginHorizontal="@dimen/content_padding"
+		android:layout_marginVertical="@dimen/content_padding_half"
+		android:minHeight="@dimen/route_info_control_buttons_height"
+		android:text="Navigate Map" />
+
+	<Button
+		android:id="@+id/points_on_map_button"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginHorizontal="@dimen/content_padding"
+		android:layout_marginVertical="@dimen/content_padding_half"
+		android:minHeight="@dimen/route_info_control_buttons_height"
+		android:text="Points on map" />
+
+	<Button
+		android:id="@+id/full_map_button"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginHorizontal="@dimen/content_padding"
+		android:layout_marginVertical="@dimen/content_padding_half"
+		android:minHeight="@dimen/route_info_control_buttons_height"
+		android:text="Full OsmAnd Map Activity" />
+
+</LinearLayout>

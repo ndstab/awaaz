@@ -1,0 +1,67 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+android {
+	compileSdk 35
+	buildToolsVersion = "35.0.0"
+
+	namespace = "net.osmand.osmandapidemo"
+
+	defaultConfig {
+		applicationId "net.osmand.osmandapidemo"
+		minSdkVersion 24
+		targetSdkVersion 35
+		versionCode System.getenv("APK_NUMBER_VERSION") ? System.getenv("APK_NUMBER_VERSION").toInteger() : 100
+		versionName System.getenv("APK_VERSION")? System.getenv("APK_VERSION").toString(): "1.0-dev"
+	}
+	signingConfigs {
+		development {
+			storeFile file("/var/lib/jenkins/debug.keystore")
+			storePassword "android"
+			keyAlias "androiddebugkey"
+			keyPassword "android"
+		}
+
+		publishing {
+			storeFile file("/var/lib/jenkins/osmand_key")
+			storePassword System.getenv("OSMAND_APK_PASSWORD")
+			keyAlias "osmand"
+			keyPassword System.getenv("OSMAND_APK_PASSWORD")
+		}
+	}
+
+	compileOptions {
+		sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17
+	}
+
+	kotlinOptions {
+		jvmTarget = "17"
+	}
+
+	buildFeatures {
+		aidl true
+		viewBinding true
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			signingConfig signingConfigs.publishing
+		}
+	}
+	sourceSets {
+		main {
+			aidl.srcDirs = ["src"]
+			java.srcDirs = ["src"]
+		}
+	}
+}
+
+dependencies {
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
+	implementation "net.osmand:android-aidl-lib:master-snapshot@aar"
+	implementation 'androidx.appcompat:appcompat:1.6.1'
+	implementation 'com.google.android.material:material:1.9.0'
+}
