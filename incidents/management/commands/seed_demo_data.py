@@ -3,6 +3,7 @@ from __future__ import annotations
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 from django.utils import timezone
 
 from incidents.models import Incident
@@ -14,30 +15,43 @@ User = get_user_model()
 class Command(BaseCommand):
   help = "Seed demo users and incidents for Awaaz"
 
-  def handle(self, *args, **options):
-    civilian, _ = User.objects.get_or_create(
-      email="civilian@awaaz.demo",
-      defaults={
-        "username": "civilian",
-      },
-    )
-    if not civilian.has_usable_password():
-      civilian.set_password("demo1234")
-      civilian.save()
+  def _get_or_update_user(
+    self,
+    *,
+    email: str,
+    username: str,
+    password: str,
+    role,
+    verified: bool,
+  ):
+    user = User.objects.filter(Q(email=email) | Q(username=username)).first()
+    if user is None:
+      user = User(email=email, username=username)
 
-    authority, _ = User.objects.get_or_create(
-      email="authority@awaaz.demo",
-      defaults={
-        "username": "authority",
-        "role": User.Role.AUTHORITY,
-        "verified": True,
-      },
+    user.email = email
+    user.username = username
+    user.role = role
+    user.verified = verified
+    user.set_password(password)
+    user.save()
+    return user
+
+  def handle(self, *args, **options):
+    civilian = self._get_or_update_user(
+      email="civilian@awaaz.demo",
+      username="civilian",
+      password="demo1234",
+      role=User.Role.CIVILIAN,
+      verified=False,
     )
-    authority.role = User.Role.AUTHORITY
-    authority.verified = True
-    if not authority.has_usable_password():
-      authority.set_password("demo1234")
-    authority.save()
+
+    authority = self._get_or_update_user(
+      email="authority@awaaz.demo",
+      username="authority",
+      password="demo1234",
+      role=User.Role.AUTHORITY,
+      verified=True,
+    )
 
     now = timezone.now()
 
@@ -97,7 +111,7 @@ class Command(BaseCommand):
     ]
 
     for sample in samples:
-      code, city, state = sample["key"]
+      _code, city, state = sample["key"]
       incident, created = Incident.objects.get_or_create(
         reporter=authority,
         city=city,
