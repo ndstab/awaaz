@@ -2,22 +2,26 @@
 {% load static %}
 
 {% block content %}
-  <h2>Log in</h2>
+  <article class="auth-card">
+    <header>
+      <h2>Log in</h2>
+    </header>
 
-  <form id="login-form">
-    <div>
+    <form id="login-form">
       <label for="email">Email</label>
       <input id="email" name="email" type="email" required autocomplete="email" />
-    </div>
-    <div>
+
       <label for="password">Password</label>
       <input id="password" name="password" type="password" required autocomplete="current-password" />
-    </div>
-    <button type="submit">Log in</button>
-    <p id="login-message" role="status"></p>
-  </form>
 
-  <p>Don't have an account? <a href="/register/">Register</a></p>
+      <button type="submit">Log in</button>
+      <p id="login-message" role="status"></p>
+    </form>
+
+    <footer>
+      <small>Don't have an account? <a href="/register/">Register</a></small>
+    </footer>
+  </article>
 
   <script src="{% static 'js/auth.js' %}"></script>
   <script>
@@ -43,6 +47,8 @@
         }
 
         setTokens(data.access, data.refresh);
+        localStorage.setItem("awaaz_display", email);
+
         const params = new URLSearchParams(window.location.search);
         const next = params.get("next") || "/";
         window.location.href = next;

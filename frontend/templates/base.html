@@ -6,30 +6,72 @@
     <title>Awaaz</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    />
+    <link
       href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/awaaz.css' %}" />
   </head>
   <body>
-    <header>
-      <h1><a href="/">Awaaz</a></h1>
+    <header class="container">
       <nav>
-        <a href="/">Map</a>
-        <a href="/report/">Report</a>
-        <a href="/login/">Log in</a>
-        <a href="/register/">Register</a>
-        <a href="#" id="logout-link">Log out</a>
+        <ul>
+          <li><strong><a href="/">Awaaz</a></strong></li>
+        </ul>
+        <ul>
+          <li><a href="/">Map</a></li>
+          <li><a href="/report/">Report Incident</a></li>
+          <li><a href="/login/" id="nav-login">Login</a></li>
+          <li><a href="/register/" id="nav-register">Register</a></li>
+          <li><a href="#" id="nav-user" style="display:none;"></a></li>
+          <li><a href="#" id="logout-link" style="display:none;">Logout</a></li>
+        </ul>
       </nav>
     </header>
-    <main>
+
+    <main class="container">
       {% block content %}{% endblock %}
     </main>
+
+    <footer class="container">
+      <small>
+        Awaaz -- Open road incident data for India · Licensed under AGPL-3.0 ·
+        <a href="https://github.com/ndstab/awaaz">GitHub</a>
+      </small>
+    </footer>
+
     <script src="{% static 'js/auth.js' %}"></script>
     <script>
+      (function () {
+        const token = typeof getToken === "function" ? getToken() : null;
+        const login = document.getElementById("nav-login");
+        const register = document.getElementById("nav-register");
+        const user = document.getElementById("nav-user");
+        const logout = document.getElementById("logout-link");
+
+        const display = localStorage.getItem("awaaz_display");
+        if (token) {
+          if (login) login.style.display = "none";
+          if (register) register.style.display = "none";
+          if (logout) logout.style.display = "";
+          if (user) {
+            user.style.display = "";
+            user.textContent = display ? display : "Account";
+            user.href = "#";
+          }
+        } else {
+          if (logout) logout.style.display = "none";
+          if (user) user.style.display = "none";
+        }
+      })();
+
       document.getElementById("logout-link")?.addEventListener("click", (e) => {
         e.preventDefault();
         if (typeof clearTokens === "function") clearTokens();
+        localStorage.removeItem("awaaz_display");
         window.location.href = "/";
       });
     </script>

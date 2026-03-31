@@ -1,0 +1,50 @@
+:root {
+  --container-width: 980px;
+}
+
+main.container {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+footer.container {
+  padding-top: 0.5rem;
+  padding-bottom: 2rem;
+  opacity: 0.9;
+}
+
+#map {
+  height: 75vh;
+  min-height: 300px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.map-wrap {
+  margin-top: 0.75rem;
+}
+
+.auth-card {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.form-card {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+dl.grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.25rem 1rem;
+}
+
+dl.grid dt {
+  font-weight: 600;
+}
+
+dl.grid dd {
+  margin: 0;
+}
+
