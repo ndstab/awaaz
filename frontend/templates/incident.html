@@ -74,7 +74,14 @@
               window.location.reload();
             } else {
               if (typeof handleAuthError === "function" && handleAuthError(res.status)) return;
-              msg.textContent = "Error " + res.status;
+              let detail = "";
+              try {
+                const body = await res.json();
+                if (body && typeof body.detail === "string") detail = body.detail;
+              } catch (_) {
+                // Ignore parse errors and fall back to status text.
+              }
+              msg.textContent = detail || ("Error " + res.status);
             }
           } catch (err) {
             msg.textContent = "Request failed.";
