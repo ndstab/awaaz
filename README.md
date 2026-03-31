@@ -16,9 +16,9 @@ The open feed is the publishing layer. Active incidents are serialized as CIFS X
 
 For readers who do not know CIFS: Closure and Incident Feed Specification is Waze’s open XML format for describing incidents in partner feeds.
 
-## Why we built this
+## Why I built this
 
-I got tired of seeing useful incident reports disappear into a single closed ecosystem. On Indian roads, the “in the moment” information matters, and it is frustrating when people share it but it never reaches the navigation app of the driver who needs it next.
+Seeing useful incident reports disappear into a single closed ecosystem was not beneficial, and this felt like a good problem to solve. On Indian roads, the “in the moment” information matters, and it is frustrating when people share it but it never reaches the navigation app of the driver who needs it next.
 
 The data is not the hard part. The hard part is access, and access needs to stay open if we want community and offline navigation tools to participate. That is why I built Awaaz around open feeds and simple self-hosting.
 
