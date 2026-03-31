@@ -87,6 +87,12 @@ To create an AUTHORITY account, go to the admin panel and update the user:
 
 Change `role` from `CIVILIAN` to `AUTHORITY` and set `verified=true`.
 
+You can also seed demo users and incidents with:
+
+```bash
+docker-compose exec web python manage.py seed_demo_data
+```
+
 ## Feed endpoints
 
 The feed is public CIFS XML. It only includes incidents that are currently active.

@@ -35,6 +35,9 @@ htmlcov/
 # Docker
 *.pid
 
+# Node
+node_modules/
+
 # Environment variables
 .env
 

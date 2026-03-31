@@ -16,6 +16,7 @@ class BaseFeedView(View):
     )
 
   def build_xml(self, incidents):
+    # CIFS Specification: https://developers.google.com/waze/data-feed/cifs-specification
     root = ET.Element("incidents")
     for incident in incidents:
       elem = ET.SubElement(
@@ -34,7 +35,10 @@ class BaseFeedView(View):
       ET.SubElement(elem, "active").text = "true"
 
     xml_bytes = ET.tostring(root, encoding="utf-8")
-    return HttpResponse(xml_bytes, content_type="application/xml")
+    return HttpResponse(
+      xml_bytes,
+      content_type="application/xml; charset=utf-8",
+    )
 
 
 class AllFeedView(BaseFeedView):
