@@ -66,4 +66,4 @@ Once the core is stable (roughly mid-March) we'll open it up properly.
 
 ## License
 
-AGPL-3.0
+Licensed under the GNU Affero General Public License (AGPL) version 3, or (at your option) any later version (AGPL-3.0-or-later).
