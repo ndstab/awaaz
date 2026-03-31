@@ -16,7 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   map.addControl(new maplibregl.NavigationControl(), "top-right");
 
-  const markersById = new Map();
+  const INCIDENTS_SOURCE_ID = "awaaz-incidents";
+  const PENDING_LAYER_ID = "awaaz-incidents-pending";
+  const ACTIVE_LAYER_ID = "awaaz-incidents-active";
   let lastRequestId = 0;
 
   function bboxParamFromBounds(bounds) {
@@ -76,10 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // eslint-disable-next-line no-console
     console.log("Awaaz map: incidents fetched", incidents.length);
 
-    const seen = new Set();
+    const features = [];
     for (const incident of incidents) {
-      seen.add(incident.id);
-
       let lng = incident.longitude;
       let lat = incident.latitude;
       if (typeof lng !== "number" || typeof lat !== "number") {
@@ -87,29 +87,26 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!coords) continue;
         [lng, lat] = coords;
       }
-
-      let marker = markersById.get(incident.id);
-      if (!marker) {
-        const popup = new maplibregl.Popup({ offset: 18 }).setHTML(
-          incidentPopupHtml(incident),
-        );
-        const el = document.createElement("div");
-        el.className = "awaaz-marker";
-        marker = new maplibregl.Marker({ element: el })
-          .setLngLat([lng, lat])
-          .setPopup(popup)
-          .addTo(map);
-        markersById.set(incident.id, marker);
-      } else {
-        marker.setLngLat([lng, lat]);
-      }
+      features.push({
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [lng, lat],
+        },
+        properties: {
+          id: incident.id,
+          status: String(incident.status || "").toUpperCase(),
+          popupHtml: incidentPopupHtml(incident),
+        },
+      });
     }
 
-    for (const [id, marker] of markersById.entries()) {
-      if (!seen.has(id)) {
-        marker.remove();
-        markersById.delete(id);
-      }
+    const source = map.getSource(INCIDENTS_SOURCE_ID);
+    if (source) {
+      source.setData({
+        type: "FeatureCollection",
+        features,
+      });
     }
   }
 
@@ -122,6 +119,68 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   map.on("load", () => {
+    map.addSource(INCIDENTS_SOURCE_ID, {
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: [],
+      },
+    });
+
+    map.addLayer({
+      id: PENDING_LAYER_ID,
+      type: "circle",
+      source: INCIDENTS_SOURCE_ID,
+      filter: ["==", ["get", "status"], "PENDING"],
+      paint: {
+        "circle-radius": 6,
+        "circle-color": "#3b82f6",
+        "circle-stroke-width": 2,
+        "circle-stroke-color": "#ffffff",
+      },
+    });
+
+    map.addLayer({
+      id: ACTIVE_LAYER_ID,
+      type: "circle",
+      source: INCIDENTS_SOURCE_ID,
+      filter: ["==", ["get", "status"], "ACTIVE"],
+      paint: {
+        "circle-radius": 6,
+        "circle-color": "#ef4444",
+        "circle-stroke-width": 2,
+        "circle-stroke-color": "#ffffff",
+      },
+    });
+
+    function onIncidentClick(e) {
+      const feature = e.features?.[0];
+      if (!feature) return;
+      const coordinates = feature.geometry?.coordinates;
+      const popupHtml = feature.properties?.popupHtml;
+      if (!Array.isArray(coordinates) || !popupHtml) return;
+
+      new maplibregl.Popup({ offset: 18 })
+        .setLngLat(coordinates)
+        .setHTML(popupHtml)
+        .addTo(map);
+    }
+
+    function onIncidentEnter() {
+      map.getCanvas().style.cursor = "pointer";
+    }
+
+    function onIncidentLeave() {
+      map.getCanvas().style.cursor = "";
+    }
+
+    map.on("click", PENDING_LAYER_ID, onIncidentClick);
+    map.on("click", ACTIVE_LAYER_ID, onIncidentClick);
+    map.on("mouseenter", PENDING_LAYER_ID, onIncidentEnter);
+    map.on("mouseenter", ACTIVE_LAYER_ID, onIncidentEnter);
+    map.on("mouseleave", PENDING_LAYER_ID, onIncidentLeave);
+    map.on("mouseleave", ACTIVE_LAYER_ID, onIncidentLeave);
+
     scheduleRefresh();
   });
   map.on("moveend", () => {

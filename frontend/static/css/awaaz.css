@@ -48,3 +48,28 @@ dl.grid dd {
   margin: 0;
 }
 
+/* Map markers:
+   - small fixed-size dots (never stretch full width)
+   - status-based color (ACTIVE vs PENDING)
+*/
+.awaaz-marker {
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-radius: 9999px;
+  flex: 0 0 auto;
+  display: block;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  background: #3b82f6; /* PENDING (blue) default */
+}
+
+.awaaz-marker--pending {
+  background: #3b82f6;
+}
+
+.awaaz-marker--active {
+  background: #ef4444; /* bright red */
+}
+
